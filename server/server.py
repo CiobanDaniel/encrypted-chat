@@ -32,7 +32,7 @@ def broadcast(message, sender_conn):
         if client != sender_conn:
             try:
                 client.sendall(message)
-            except:
+            except Exception:
                 clients.remove(client)
 
 def start_server():
