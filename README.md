@@ -47,7 +47,8 @@ chat-criptat-proiect/
 │   ├── account-identity-model.md # Model pentru cont anonim + phone/email opțional
 │   ├── device-migration-and-backup.md # Strategia de backup și migrare device
 │   ├── deployment-separation.md # Cum rulezi server/client pe mașini diferite
-│   └── hosting-options.md  # Opțiuni de hosting pentru lansare publică
+│   ├── hosting-options.md  # Opțiuni de hosting pentru lansare publică
+│   └── vps-bootstrap-checklist.md # Checklist complet pentru rollout pe VPS
 │
 ├── deploy/
 │   ├── haproxy/
@@ -98,6 +99,7 @@ python server/server.py
 *(Pentru oprirea serverului folosiți combinația `Ctrl+C` în terminal).*
 
 > Pentru deployment separat (server remote + client local), vezi `docs/deployment-separation.md`.
+> Pentru setup complet pe Ubuntu VPS, vezi `docs/vps-bootstrap-checklist.md`.
 
 ### 2.1 Pornire Server cu Docker Compose (opțional, recomandat pentru hosting)
 ```bash

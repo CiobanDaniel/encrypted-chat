@@ -1,2 +1,4 @@
+# Full local setup (client + shared crypto).
+# For server-only deployments use: server/requirements-server.txt
 cryptography>=41.0.0
 customtkinter>=5.2.2
