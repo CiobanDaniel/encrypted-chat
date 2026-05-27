@@ -8,7 +8,7 @@ This is a transitional protocol spec for the current codebase. It standardizes p
 - `REGISTER_JSON:<json_payload>`
 - `LINK_CREATE:<username>:<device_id>`
 - `LINK_CONSUME:<username>:<code>:<new_device_id>`
-- `LINK_APPROVE_SIG:<username>:<link_token>:<signature_b64>`
+- `LINK_APPROVE_SIG:<username>:<approval_ref>:<signature_b64>`
 - `ROUTE:<target_username>:<payload_bytes>`
 - `FROM:<sender_username>:<payload_bytes>`
 - `SERVER:<message>`

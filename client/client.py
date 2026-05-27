@@ -515,11 +515,11 @@ class SecureChatApp(ctk.CTk):
                         self.save_and_display_message(self.username, f"[SISTEM] {info}", True)
                         continue
                     if server_msg.startswith("LINK_APPROVAL_REQUEST:"):
-                        # LINK_APPROVAL_REQUEST:<token>:<target_device_id>:<code>
+                        # LINK_APPROVAL_REQUEST:<approval_ref>:<target_device_id>:<code>
                         parts = server_msg.split(":", 3)
                         if len(parts) == 4:
-                            token, target_device_id, code = parts[1], parts[2], parts[3]
-                            self.pending_link_approvals[token] = {
+                            approval_ref, target_device_id, code = parts[1], parts[2], parts[3]
+                            self.pending_link_approvals[approval_ref] = {
                                 "target_device_id": target_device_id,
                                 "code": code,
                             }
@@ -532,9 +532,9 @@ class SecureChatApp(ctk.CTk):
                                 ),
                             )
                             if approved:
-                                approval_text = f"LINK_APPROVAL:{self.username}:{token}:{target_device_id}"
+                                approval_text = f"LINK_APPROVAL:{self.username}:{approval_ref}:{target_device_id}"
                                 signature_b64 = sign_link_approval(self.my_private_key, approval_text)
-                                cmd = f"LINK_APPROVE_SIG:{self.username}:{token}:{signature_b64}"
+                                cmd = f"LINK_APPROVE_SIG:{self.username}:{approval_ref}:{signature_b64}"
                                 self.client_socket.sendall(cmd.encode("utf-8"))
                             else:
                                 self.save_and_display_message(
@@ -544,15 +544,15 @@ class SecureChatApp(ctk.CTk):
                                 )
                         continue
                     if server_msg.startswith("LINK_APPROVED:"):
-                        # LINK_APPROVED:<account_id>:<creator_identity_b64>:<owner_username>:<token>:<target_device_id>:<signature_b64>
+                        # LINK_APPROVED:<account_id>:<creator_identity_b64>:<owner_username>:<approval_ref>:<target_device_id>:<signature_b64>
                         parts = server_msg.split(":", 6)
                         if len(parts) == 7:
                             account_id, creator_identity_b64 = parts[1], parts[2]
-                            owner_username, token, target_device_id, signature_b64 = parts[3], parts[4], parts[5], parts[6]
+                            owner_username, approval_ref, target_device_id, signature_b64 = parts[3], parts[4], parts[5], parts[6]
                             if target_device_id != self.profile.get("device_id", ""):
                                 messagebox.showerror("Link device", "Aprobarea primita nu este pentru acest device.")
                                 continue
-                            approval_text = f"LINK_APPROVAL:{owner_username}:{token}:{target_device_id}"
+                            approval_text = f"LINK_APPROVAL:{owner_username}:{approval_ref}:{target_device_id}"
                             try:
                                 creator_identity_bytes = base64.b64decode(creator_identity_b64.encode("ascii"))
                             except Exception:

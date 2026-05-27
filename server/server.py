@@ -55,8 +55,8 @@ def _first_device_for_username(username):
     return client_metadata.get(first)
 
 
-def _build_link_approval_text(owner_username, link_token, target_device_id):
-    return f"LINK_APPROVAL:{owner_username}:{link_token}:{target_device_id}"
+def _build_link_approval_text(owner_username, approval_ref, target_device_id):
+    return f"LINK_APPROVAL:{owner_username}:{approval_ref}:{target_device_id}"
 
 
 def _verify_signature(identity_key_b64, approval_text, signature_b64):
@@ -117,9 +117,9 @@ def handle_client(conn, addr):
                     req_key = (link_username, code)
                     request = pending_link_requests.get(req_key)
                     if request:
-                        link_token = secrets.token_hex(12)
+                        approval_ref = secrets.token_hex(12)
                         request["target_device_id"] = new_device_id
-                        request["link_token"] = link_token
+                        request["approval_ref"] = approval_ref
                         request["requester_username"] = username
                         request["requester_device_id"] = device_id
                         request["approved"] = False
@@ -128,7 +128,7 @@ def handle_client(conn, addr):
                         _notify_device(
                             link_username,
                             creator_device_id,
-                            f"LINK_APPROVAL_REQUEST:{link_token}:{new_device_id}:{code}",
+                            f"LINK_APPROVAL_REQUEST:{approval_ref}:{new_device_id}:{code}",
                         )
                         conn.sendall(build_server_message("LINK_PENDING:Astept aprobare de pe device-ul principal."))
                     else:
@@ -136,13 +136,13 @@ def handle_client(conn, addr):
                 continue
 
             if text_data.startswith("LINK_APPROVE_SIG:"):
-                # LINK_APPROVE_SIG:<username>:<link_token>:<signature_b64>
+                # LINK_APPROVE_SIG:<username>:<approval_ref>:<signature_b64>
                 parts = text_data.split(":", 3)
                 if len(parts) == 4:
-                    owner_username, link_token, signature_b64 = parts[1], parts[2], parts[3]
+                    owner_username, approval_ref, signature_b64 = parts[1], parts[2], parts[3]
                     matched_key = None
                     for key, request in pending_link_requests.items():
-                        if key[0] == owner_username and request.get("link_token") == link_token:
+                        if key[0] == owner_username and request.get("approval_ref") == approval_ref:
                             matched_key = key
                             break
                     if matched_key is None:
@@ -156,7 +156,7 @@ def handle_client(conn, addr):
                     account_id = account_meta.get("account_id", "")
                     creator_identity = account_meta.get("identity_key_b64", "")
                     target_device_id = request.get("target_device_id", "")
-                    approval_text = _build_link_approval_text(owner_username, link_token, target_device_id)
+                    approval_text = _build_link_approval_text(owner_username, approval_ref, target_device_id)
                     if not _verify_signature(creator_identity, approval_text, signature_b64):
                         conn.sendall(build_server_message("LINK_ERR:Semnatura de aprobare invalida."))
                         continue
@@ -168,7 +168,7 @@ def handle_client(conn, addr):
                     if requester_conn:
                         requester_conn.sendall(
                             build_server_message(
-                                f"LINK_APPROVED:{account_id}:{creator_identity}:{owner_username}:{link_token}:{target_device_id}:{signature_b64}"
+                                f"LINK_APPROVED:{account_id}:{creator_identity}:{owner_username}:{approval_ref}:{target_device_id}:{signature_b64}"
                             )
                         )
                     conn.sendall(build_server_message("LINK_INFO:Cerere aprobata."))
