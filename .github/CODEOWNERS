@@ -1,0 +1,12 @@
+# Default owner for everything
+* @CiobanDaniel
+
+# Security-sensitive paths require explicit owner review
+shared/protocol.py @CiobanDaniel
+client/crypto_utils.py @CiobanDaniel
+client/identity_store.py @CiobanDaniel
+server/server.py @CiobanDaniel
+deploy/ @CiobanDaniel
+.github/workflows/ @CiobanDaniel
+docs/threat-model.md @CiobanDaniel
+docs/protocol-v1.md @CiobanDaniel

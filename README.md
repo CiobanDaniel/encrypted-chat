@@ -48,7 +48,8 @@ chat-criptat-proiect/
 │   ├── device-migration-and-backup.md # Strategia de backup și migrare device
 │   ├── deployment-separation.md # Cum rulezi server/client pe mașini diferite
 │   ├── hosting-options.md  # Opțiuni de hosting pentru lansare publică
-│   └── vps-bootstrap-checklist.md # Checklist complet pentru rollout pe VPS
+│   ├── vps-bootstrap-checklist.md # Checklist complet pentru rollout pe VPS
+│   └── repo-hardening-checklist.md # Checklist securizare repository
 │
 ├── deploy/
 │   ├── haproxy/
@@ -68,6 +69,8 @@ chat-criptat-proiect/
 ├── .github/workflows/      # CI/CD: publish image, deploy VPS, uptime check
 │
 ├── requirements.txt        # Dependințele proiectului
+├── SECURITY.md             # Politică raportare vulnerabilități
+├── CONTRIBUTING.md         # Ghid contribuții și reguli PR
 └── README.md               # Documentația curentă
 ```
 
