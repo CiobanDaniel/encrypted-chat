@@ -1,0 +1,8 @@
+[securechat-haproxy]
+enabled  = true
+port     = 65432
+filter   = securechat-haproxy
+logpath  = /var/log/haproxy.log
+maxretry = 30
+findtime = 60
+bantime  = 3600

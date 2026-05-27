@@ -1,0 +1,22 @@
+name: Uptime Check
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+jobs:
+  tcp-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check TCP endpoint
+        env:
+          HOST: ${{ secrets.SECURECHAT_HEALTH_HOST }}
+          PORT: ${{ secrets.SECURECHAT_HEALTH_PORT }}
+        run: |
+          if [ -z "$HOST" ]; then
+            echo "SECURECHAT_HEALTH_HOST secret not set"
+            exit 1
+          fi
+          timeout 5 bash -c "cat < /dev/null > /dev/tcp/$HOST/${PORT:-65432}"
+          echo "SecureChat endpoint reachable"

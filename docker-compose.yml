@@ -1,0 +1,13 @@
+services:
+  securechat-server:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    container_name: securechat-server
+    restart: unless-stopped
+    environment:
+      SECURECHAT_SERVER_BIND_HOST: ${SECURECHAT_SERVER_BIND_HOST:-0.0.0.0}
+      SECURECHAT_SERVER_BIND_PORT: ${SECURECHAT_SERVER_BIND_PORT:-65432}
+      SECURECHAT_BUFFER_SIZE: ${SECURECHAT_BUFFER_SIZE:-4096}
+    ports:
+      - "${SECURECHAT_SERVER_BIND_PORT:-65432}:${SECURECHAT_SERVER_BIND_PORT:-65432}"

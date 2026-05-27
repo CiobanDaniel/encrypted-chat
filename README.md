@@ -30,10 +30,41 @@ chat-criptat-proiect/
 │
 ├── client/
 │   ├── client.py           # Interfața grafică și logica de rețea
-│   └── crypto_utils.py     # Modul izolat pentru generarea și derivarea cheilor
+│   ├── crypto_utils.py     # Modul izolat pentru criptare și safety number
+│   ├── backup_utils.py     # Export/import backup criptat
+│   ├── chat_archive_store.py # Persistență locală pentru istoric conversații
+│   ├── identity_store.py   # Persistență pentru cheia de identitate și trust store
+│   ├── profile_store.py    # Profil local (account_id, device_id, mod cont)
+│   └── session_store.py    # Stare sesiuni/mesaje separată de UI
 │
 ├── shared/
-│   └── config.py           # Configurații comune (IP, PORT, BUFFER_SIZE)
+│   ├── config.py           # Configurații comune (IP, PORT, BUFFER_SIZE)
+│   └── protocol.py         # Helpere comune pentru protocolul de transport
+│
+├── docs/
+│   ├── threat-model.md     # Modelul de amenințări (v1)
+│   ├── protocol-v1.md      # Specificația protocolului și pașii următori
+│   ├── account-identity-model.md # Model pentru cont anonim + phone/email opțional
+│   ├── device-migration-and-backup.md # Strategia de backup și migrare device
+│   ├── deployment-separation.md # Cum rulezi server/client pe mașini diferite
+│   └── hosting-options.md  # Opțiuni de hosting pentru lansare publică
+│
+├── deploy/
+│   ├── haproxy/
+│   │   └── haproxy.cfg      # Proxy TCP + limits de conexiune
+│   ├── fail2ban/
+│   │   ├── filter.d/securechat-haproxy.conf
+│   │   └── jail.d/securechat.local
+│   ├── scripts/
+│   │   ├── ufw-harden.sh    # Script hardening firewall pentru VPS
+│   │   └── healthcheck-tcp.sh # Health check simplu endpoint TCP
+│   └── systemd/
+│       └── securechat-server.service # Unit file pentru Linux servers
+│
+├── docker-compose.yml      # Deploy rapid server prin Docker Compose
+├── docker-compose.prod.yml # Stack production: proxy + server intern
+├── .env.example            # Variabile de mediu pentru server/client
+├── .github/workflows/      # CI/CD: publish image, deploy VPS, uptime check
 │
 ├── requirements.txt        # Dependințele proiectului
 └── README.md               # Documentația curentă
@@ -65,6 +96,45 @@ Serverul trebuie pornit primul pentru a accepta conexiunile.
 python server/server.py
 ```
 *(Pentru oprirea serverului folosiți combinația `Ctrl+C` în terminal).*
+
+> Pentru deployment separat (server remote + client local), vezi `docs/deployment-separation.md`.
+
+### 2.1 Pornire Server cu Docker Compose (opțional, recomandat pentru hosting)
+```bash
+# Copiază fișierul de env și ajustează valorile
+cp .env.example .env
+
+# Construiește și pornește serverul în background
+docker compose up -d --build
+
+# Verifică log-urile
+docker compose logs -f securechat-server
+```
+
+### 2.1.1 Pornire stack production (HAProxy + server)
+```bash
+cp .env.example .env
+docker compose -f docker-compose.prod.yml up -d --build
+docker compose -f docker-compose.prod.yml logs -f securechat-proxy
+```
+
+### 2.1.2 Hardening rapid pe VPS (UFW)
+```bash
+chmod +x deploy/scripts/ufw-harden.sh
+SECURECHAT_PUBLIC_PORT=65432 ./deploy/scripts/ufw-harden.sh
+```
+
+### 2.2 Pornire Server ca serviciu Linux (systemd)
+1. Copiază repo-ul pe server (ex: `/opt/securechat`).
+2. Copiază `deploy/systemd/securechat-server.service` în `/etc/systemd/system/`.
+3. Creează `/etc/securechat/server.env` cu variabilele din `.env.example`.
+4. Rulează:
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable securechat-server
+sudo systemctl start securechat-server
+sudo systemctl status securechat-server
+```
 
 ### 3. Pornirea Clienților
 Deschideți terminale separate (cu mediul virtual activat) pentru a lansa instanțe de clienți:

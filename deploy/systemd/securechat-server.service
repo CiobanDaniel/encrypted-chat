@@ -1,0 +1,16 @@
+[Unit]
+Description=SecureChat E2EE Routing Server
+After=network.target
+
+[Service]
+Type=simple
+User=securechat
+Group=securechat
+WorkingDirectory=/opt/securechat
+EnvironmentFile=/etc/securechat/server.env
+ExecStart=/usr/bin/python3 /opt/securechat/server/server.py
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
