@@ -611,10 +611,10 @@ class SecureChatApp(ctk.CTk):
     def on_closing(self):
         self.chat_archive_store.save_archive(self.session_store.export_messages())
         if self.client_socket:
-            try: 
+            try:
                 self.client_socket.close()
-            except Exception: 
-                pass
+            except OSError as e:
+                print(f"[WARN] Socket close failed: {e}")
         self.destroy()
 
 if __name__ == "__main__":

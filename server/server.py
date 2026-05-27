@@ -188,8 +188,8 @@ def handle_client(conn, addr):
                 else:
                     conn.sendall(build_server_message(f"Utilizatorul '{target_user}' nu este online."))
 
-    except Exception:
-        pass
+    except Exception as e:
+        print(f"[WARN] Eroare in handle_client pentru {addr}: {e}")
     finally:
         if username and device_id:
             _unregister_connection(username, device_id)
